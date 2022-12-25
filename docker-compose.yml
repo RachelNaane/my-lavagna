@@ -12,7 +12,7 @@ services:
       - app
 
   app:
-    image: 752620938895.dkr.ecr.us-east-1.amazonaws.com/my-lavagna:latest
+    image: public.ecr.aws/c7o8u9c1/rachel-naane-lavagna:latest
     expose: 
       - "8080"
     networks:

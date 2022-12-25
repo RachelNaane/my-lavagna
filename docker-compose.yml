@@ -1,0 +1,51 @@
+services:
+  proxy:
+    image: nginx:1.23.3
+    ports:
+      - "80:80"
+    volumes: 
+      - ./nginx/my.conf:/etc/nginx/conf.d/default.conf
+      - ./app/project/src/main/webapp:/usr/share/nginx/html
+    networks:
+      - frontend
+    depends_on:
+      - app
+
+  app:
+    image: 752620938895.dkr.ecr.us-east-1.amazonaws.com/my-lavagna:latest
+    expose: 
+      - "8080"
+    networks:
+      - frontend
+      - backend
+    depends_on: 
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:5.7
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "lavagna"
+    volumes:
+      - ./db/conf:/etc/mysql/conf.d
+      - ./db/sql:/docker-entrypoint-initdb.d
+      - lavagna_data:/var/lib/mysql
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --silent"]
+      timeout: 5s
+      retries: 50
+      start_period: 5s
+
+volumes:
+  lavagna_data:
+
+networks:
+  frontend:
+  backend:
+    
+    
